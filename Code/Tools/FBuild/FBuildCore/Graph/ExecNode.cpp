@@ -95,6 +95,15 @@ ExecNode::~ExecNode() = default;
         FLOG_ERROR( "Execution failed (error %i) '%s'", result, GetName().Get() );
         return NODE_RESULT_FAILED;
     }
+    else
+    {
+        if ( FBuild::Get().GetOptions().m_ShowCommandOutput )
+        {
+            if ( !m_UseStdOutAsOutput )
+                Node::DumpOutput( job, memOut.Get(), memOutSize );
+            Node::DumpOutput( job, memErr.Get(), memErrSize );
+        }
+    }
 
     if ( m_UseStdOutAsOutput == true )
     {

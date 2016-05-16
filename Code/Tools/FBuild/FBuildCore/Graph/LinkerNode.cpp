@@ -169,6 +169,11 @@ LinkerNode::~LinkerNode() = default;
         }
         else
         {
+            if ( FBuild::Get().GetOptions().m_ShowCommandOutput )
+            {
+                if ( memOut.Get() ) { FLOG_ERROR_DIRECT( memOut.Get() ); }
+                if ( memErr.Get() ) { FLOG_ERROR_DIRECT( memErr.Get() ); }
+            }
             break; // success!
         }
     }
@@ -207,6 +212,14 @@ LinkerNode::~LinkerNode() = default;
             if ( memErr.Get() ) { FLOG_ERROR_DIRECT( memErr.Get() ); }
             FLOG_ERROR( "Failed to stamp %s '%s' (error %i - '%s')", GetDLLOrExe(), GetName().Get(), result, m_LinkerStampExe->GetName().Get() );
             return NODE_RESULT_FAILED;
+        }
+        else
+        {
+            if ( FBuild::Get().GetOptions().m_ShowCommandOutput )
+            {
+                if ( memOut.Get() ) { FLOG_ERROR_DIRECT( memOut.Get() ); }
+                if ( memErr.Get() ) { FLOG_ERROR_DIRECT( memErr.Get() ); }
+            }
         }
 
         // success!

@@ -167,6 +167,14 @@ LibraryNode::~LibraryNode() = default;
         FLOG_ERROR( "Failed to build Library (error %i) '%s'", result, GetName().Get() );
         return NODE_RESULT_FAILED;
     }
+    else
+    {
+        if ( FBuild::Get().GetOptions().m_ShowCommandOutput )
+        {
+            if ( memOut.Get() ) { FLOG_ERROR_DIRECT( memOut.Get() ); }
+            if ( memErr.Get() ) { FLOG_ERROR_DIRECT( memErr.Get() ); }
+        }
+    }
 
     // record time stamp for next time
     m_Stamp = FileIO::GetFileLastWriteTime( m_Name );

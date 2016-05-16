@@ -104,6 +104,7 @@ int Main(int argc, char * argv[])
     bool useCacheWrite = false;
     bool allowDistributed = false;
     bool showCommands = false;
+    bool verboseCommands = false;
     bool showSummary = false;
     bool report = false;
     bool fixupErrorPaths = false;
@@ -217,6 +218,11 @@ int Main(int argc, char * argv[])
             else if ( thisArg == "-showcmds" )
             {
                 showCommands = true;
+                continue;
+            }
+            else if ( thisArg == "-verbosecmds" )
+            {
+                verboseCommands = true;
                 continue;
             }
             else if ( thisArg == "-showtargets" )
@@ -405,6 +411,7 @@ int Main(int argc, char * argv[])
     options.m_ShowProgress = progressBar;
     options.m_ShowInfo = verbose;
     options.m_ShowCommandLines = showCommands;
+    options.m_ShowCommandOutput = verboseCommands;
     options.m_UseCacheRead = useCacheRead;
     options.m_UseCacheWrite = useCacheWrite;
     if ( numWorkers >= 0 )
@@ -505,6 +512,8 @@ void DisplayHelp()
             "                to report.html.  This will lengthen the total build\n"
             "                time.\n"
             " -showcmds      Show command lines used to launch external processes.\n"
+            " -verbosecmds   Always show output from external processes (linker,\n"
+            "                librarian, stamp executable).\n"
             " -showtargets   Display list of primary build targets.\n"
             " -summary       Show a summary at the end of the build.\n"
             " -verbose       Show detailed diagnostic information. This will slow\n"
