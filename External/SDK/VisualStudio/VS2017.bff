@@ -29,8 +29,8 @@
         //
         // Use Visual Studio installation
         //
-        #if file_exists( "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64/cl.exe" )
-            .VS2017_BasePath        = 'C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC'
+        #if file_exists( "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64/cl.exe" )
+            .VS2017_BasePath        = 'C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC'
             .VS2017_Version         = '14.16.27023'
         #else
             //
@@ -99,6 +99,9 @@ Compiler( 'Compiler-VS2017-x64' )
     .VSIncludePaths_ClangCl         = ' /imsvc "$VS2017_ToolchainPath$/include/"'
     .VSLibPaths                     = ' /LIBPATH:"$VS2017_ToolchainPath$/lib/x64"'
     .VCPackagesPath                 = '$VS2017_BasePath$/../Common7/IDE/VC/vcpackages'
+    #if !CI_BUILD
+        .VCPackagesPath             = '$VS2017_ToolchainPath$/lib/x86/store/references'
+    #endif
 
     // Compiler
     .Compiler                       = 'Compiler-VS2017-X64'

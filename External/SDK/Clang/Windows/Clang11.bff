@@ -33,6 +33,9 @@
         #endif
     #endif
 #endif
+#if !CI_BUILD
+    .Clang11_BasePath     = 'C:\Program Files\LLVM'
+#endif
 
 // Print details of used version. TODO:C Move to Clang.bff
 Print( 'Using Clang $Clang11_Version$ from $Clang11_BasePath$' )
@@ -145,6 +148,12 @@ Compiler( 'Compiler-Clang11-NonCL' )
                                     + ' -Wno-missing-noreturn'          // function '%s' could be declared with attribute 'noreturn'
                                     + ' -Wno-old-style-cast'            // use of old-style cast
                                     + ' -Wno-switch-enum'               // %u enumeration values not explicitly handled in switch: '%s', '%s'...
+
+    #if !CI_BUILD
+                                    // Warnings in my Clang version
+                                    + ' -Wno-cast-function-type'
+                                    + ' -Wno-reserved-identifier'
+    #endif
 
     .CompilerOptions                = ' /TP -o"%2" "%1" $CommonCompilerOptions$'
                                     + ' /std:c++17'                     // Enable c++17 features
