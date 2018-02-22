@@ -19,6 +19,15 @@ Settings
         .Environment    = { "PATH=$VS_PATH$",
                             "TMP=$TMP$",
                             "SystemRoot=C:\Windows" }
+        #if !CI_BUILD
+            .CachePath  = "E:\.fbuild.windows.cache"
+        #endif
+    #else
+        #if !CI_BUILD
+            #import HOME
+            .CachePath  = "$HOME$/.fbuild.cache"
+            .Workers = { '10.0.1.16' }
+        #endif
     #endif
     .AllowDBMigration_Experimental = true
 }
@@ -38,7 +47,7 @@ Settings
         // to improve iteration times.
         // - Only in Debug as this impacts performance (inlining)
         // - Only when not building from tests (FASTBuild building itself)
-        .UnityInputIsolateWritableFiles = true
+        .UnityInputIsolateWritableFiles = false
         // Also not when building on CI (which build from git)
         #if CI_BUILD
             .UnityInputIsolateWritableFiles = false
