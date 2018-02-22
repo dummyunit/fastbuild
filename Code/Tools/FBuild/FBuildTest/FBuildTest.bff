@@ -71,6 +71,9 @@
             .TestOutput                     = "$OutputBase$/$ProjectPath$/TestOutput.txt"
             .TestWorkingDir                 = 'Tools/FBuild/FBuildTest'
             .TestTimeOut                    = 500
+            #if !CI_BUILD
+                .TestTimeOut                    = 900
+            #endif
             #if CI_BUILD
                 // Temporarily showing output to help identify things on the CI
                 // that are significantly slower than local runs
