@@ -41,7 +41,7 @@
 #else
     .ClangPath              = '../External/SDK/ClangForWindows/3.4' // TODO:B Make this use the same config as fbuild itself
 #endif
-//.ClangPath            = 'C:\Program Files (x86)\LLVM'
+.ClangPath            = 'C:\Program Files\LLVM'
 .WindowsClangToolChain =
 [
     .Compiler           = 'Compiler-ClangForWindows-Dist'
@@ -63,15 +63,15 @@
     .Compiler           = 'Compiler-GCC-Dist'
     Compiler( 'Compiler-GCC-Dist' )
     {
-        .Executable     = '/usr/bin/gcc'
+        .Executable     = '/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0/x86_64-pc-linux-gnu-gcc'
         .ExtraFiles     = {
-                            '/usr/bin/as'
-                            '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1plus'
+                            '/usr/x86_64-pc-linux-gnu/binutils-bin/2.30/as'
+                            '/usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1plus'
                           }
     }
     .CompilerDist       = 'Compiler-GCC-Dist'
     .Librarian          = '/usr/bin/ar'
-    .Linker             = '/usr/bin/g++'
+    .Linker             = '/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0/x86_64-pc-linux-gnu-g++'
 
     .BaseCompilerOptions= ' -o "%2" "%1" -c -g'
                         + ' -I./'

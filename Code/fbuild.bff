@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 #include "../External/SDK/VisualStudio/VisualStudio.bff"
 #include "../External/SDK/Windows/Windows.bff"
-.ClangBasePath      = '../External/SDK/ClangForWindows/5.0.1'
+.ClangBasePath      = 'C:\Program Files\LLVM'
 
 //------------------------------------------------------------------------------
 // Settings
@@ -18,9 +18,10 @@ Settings
         .Environment    = { "PATH=$VS_PATH$",
                             "TMP=$TMP$",
                             "SystemRoot=C:\Windows" }
-        .CachePath      = "$TMP$\.fbuild.cache"
+        .CachePath      = "E:\.fbuild.windows.cache"
     #else
-        .CachePath      = "/tmp/.fbuild.cache"
+        #import HOME
+        .CachePath      = "$HOME$/.fbuild.cache"
     #endif
     .AllowDBMigration_Experimental = true
 }
@@ -39,16 +40,15 @@ Compiler( 'Compiler-x64Clang' )
 }
 Compiler( 'Compiler-x64-Linux' )
 {
-    .Executable     = '/usr/bin/gcc'
+    .Executable     = '/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0/x86_64-pc-linux-gnu-gcc'
     .ExtraFiles     = {
-                        '/usr/bin/as'
-                        '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1'
-                        '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1plus'
+                        '/usr/x86_64-pc-linux-gnu/binutils-bin/2.30/as'
+                        '/usr/libexec/gcc/x86_64-pc-linux-gnu/7.3.0/cc1plus'
                       }
 }
 Compiler( 'Compiler-x64Clang-LinuxOSX' )
 {
-    .Executable = '/usr/bin/clang++'
+    .Executable = '/usr/lib/llvm/7/bin/clang++'
 }
 
 //------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
         // to improve iteration times.
         // - Only in Debug as this impacts performance (inlining)
         // - Only when not building from tests (FASTBuild building itself)
-        .UnityInputIsolateWritableFiles = true
+        .UnityInputIsolateWritableFiles = false
     #endif
 ]
 .Profile_Config =
@@ -112,7 +112,7 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     // These options are valid for Clang < 6.0.0:
     .CompilerOptions                = ' -fsanitize-coverage=trace-pc-guard,trace-cmp'
     // These options are valid for Clang >= 6.0.0:
-    // .CompilerOptions                = ' -fsanitize=fuzzer-no-link'
+    .CompilerOptions                = ' -fsanitize=fuzzer-no-link'
     .CompilerOptionsC               = .CompilerOptions
     .CompilerOptionsPCH             = .CompilerOptions
 ]
@@ -339,7 +339,7 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     Using( .LinuxBaseConfig )
     .Platform               = 'x64Linux'
     .Compiler               = 'Compiler-x64-Linux'
-    .Linker                 = '/usr/bin/g++'
+    .Linker                 = '/usr/x86_64-pc-linux-gnu/gcc-bin/7.3.0/x86_64-pc-linux-gnu-g++'
 ]
 .X64DebugConfig_Linux       = .X64BaseConfig_Linux
                             + .Debug_Config
@@ -358,7 +358,7 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     Using( .LinuxBaseConfig )
     .Platform               = 'x64ClangLinux'
     .Compiler               = 'Compiler-x64Clang-LinuxOSX'
-    .Linker                 = '/usr/bin/clang++'
+    .Linker                 = '/usr/lib/llvm/7/bin/clang++'
 ]
 .X64ClangDebugConfig_Linux  = .X64ClangBaseConfig_Linux
                             + .Debug_Config
