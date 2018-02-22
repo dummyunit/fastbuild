@@ -6,11 +6,11 @@
 //------------------------------------------------------------------------------
 Compiler( 'Compiler-GCC13' )
 {
-    .Executable                     = '$GCC13_BasePath$/x86_64-linux-gnu-gcc-13'
+    .Executable                     = '$GCC13_BasePath$/x86_64-pc-linux-gnu-gcc-15'
     .ExtraFiles                     = {
                                         '/usr/bin/as'
-                                        //'/usr/lib/gcc/x86_64-linux-gnu/13/cc1'
-                                        //'/usr/lib/gcc/x86_64-linux-gnu/13/cc1plus'
+                                        '/usr/libexec/gcc/x86_64-pc-linux-gnu/15/cc1'
+                                        '/usr/libexec/gcc/x86_64-pc-linux-gnu/15/cc1plus'
                                       }
     .CompilerFamily                 = 'gcc' // TODO: Remove when FASTBuild detection is improved
 
@@ -37,12 +37,13 @@ Compiler( 'Compiler-GCC13' )
                                     + ' -m64'           // x86_64
                                     + ' -D__LINUX__'    // Platform define
                                     + ' -ffreestanding' // prevent extra magic includes like stdc-predefs.h
+                                    + ' -fdiagnostics-color=auto'
 
                                     // Include paths
                                     + ' -I./'
 
                                     // Enable warnings
-                                    + ' -Wall -Werror -Wfatal-errors'   // warnings as errors
+                                    + ' -Wall -Werror'   // warnings as errors
                                     + ' -Wextra'
                                     + ' -Wshadow'
 
@@ -58,11 +59,11 @@ Compiler( 'Compiler-GCC13' )
                                     + ' -fno-exceptions'
 
     // Librarian
-    .Librarian                      = '$GCC13_BasePath$/x86_64-linux-gnu-ar'
+    .Librarian                      = '$GCC13_BasePath$/x86_64-pc-linux-gnu-ar'
     .LibrarianOptions               = 'rcs "%2" "%1"'
 
     // Linker
-    .Linker                         = '$GCC13_BasePath$/x86_64-linux-gnu-g++-13'
+    .Linker                         = '$GCC13_BasePath$/x86_64-pc-linux-gnu-g++-15'
     .LinkerOptions                  = '"%1" -o "%2"'
 
     // File Extensions

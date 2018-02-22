@@ -31,9 +31,9 @@
         //
         // Use Visual Studio installation
         //
-        #if file_exists( "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe" )
+        #if file_exists( "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe" )
             // v17.14.9
-            .VS2022_BasePath        = 'C:/Program Files/Microsoft Visual Studio/2022/Community/VC'
+            .VS2022_BasePath        = 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC'
             .VS2022_Version         = '14.44.35207'
             .VS2022_MSC_VER         = '1944'
             #define MSVC_DYNAMIC_DEOPT_AVAILABLE
@@ -131,6 +131,9 @@ Compiler( 'Compiler-VS2022-ARM64' )
     .VSIncludePaths                 = ' /external:W0 /external:I"$VS2022_ToolchainPath$/include/"'
     .VSIncludePaths_ClangCl         = ' /imsvc "$VS2022_ToolchainPath$/include/"'
     .VCPackagesPath                 = '$VS2022_BasePath$/../Common7/IDE/VC/vcpackages'
+#if !CI_BUILD
+    .VCPackagesPath                 = '$VS2022_ToolchainPath$/lib/x86/store/references'
+#endif
 
     // Compiler
     .CommonCompilerOptions          = ' /Z7 /nologo /c'

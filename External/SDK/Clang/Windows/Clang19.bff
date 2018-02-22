@@ -40,6 +40,9 @@
         #endif
     #endif
 #endif
+#if !CI_BUILD
+    .Clang19_BasePath     = 'C:\Program Files\LLVM'
+#endif
 
 // Print details of used version. TODO:C Move to Clang.bff
 Print( 'Using Clang $Clang19_Version$ from $Clang19_BasePath$' )
@@ -139,6 +142,11 @@ Compiler( 'Compiler-Clang19-NonCL' )
                                     + ' -Wno-missing-noreturn'          // function '%s' could be declared with attribute 'noreturn'
                                     + ' -Wno-old-style-cast'            // use of old-style cast
                                     + ' -Wno-unsafe-buffer-usage'       // unsafe pointer arithmetic
+    #if !CI_BUILD
+                                    // Warnings in my Clang version
+                                    + ' -Wno-cast-function-type'
+                                    + ' -Wno-reserved-identifier'
+    #endif
 
     // File Extensions
     .LibExtension                   = '.a'

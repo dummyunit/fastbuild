@@ -5,9 +5,9 @@
 //------------------------------------------------------------------------------
 #if __LINUX__ && !CI_BUILD
     //#define USING_GCC_7
-    #define USING_GCC_9
+    //#define USING_GCC_9
     //#define USING_GCC_11
-    //#define USING_GCC_13
+    #define USING_GCC_13
 #endif
 
 // Activate

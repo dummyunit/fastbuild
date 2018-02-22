@@ -5,10 +5,10 @@
 //------------------------------------------------------------------------------
 #if __LINUX__ && !CI_BUILD
     //#define USING_CLANG_6
-    #define USING_CLANG_10
+    //#define USING_CLANG_10
     //#define USING_CLANG_14
     //#define USING_CLANG_15
-    //#define USING_CLANG_18
+    #define USING_CLANG_18
 #endif
 #if __OSX__ && !CI_BUILD
     //#define USING_CLANG_8

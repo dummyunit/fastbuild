@@ -1,6 +1,6 @@
 // Clang 18.x.x
 //------------------------------------------------------------------------------
-.Clang18_BasePath = '/usr/lib/llvm-18/bin'
+.Clang18_BasePath = '/usr/lib/llvm/21/bin'
 
 // Compiler
 //------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ Compiler( 'Compiler-Clang18' )
                                     + ' -I./'
 
                                     // Enable warnings
-                                    + ' -Wall -Werror -Wfatal-errors'   // warnings as errors
+                                    + ' -Wall -Werror'   // warnings as errors
                                     + ' -Wextra'
                                     + ' -Weverything'
 
