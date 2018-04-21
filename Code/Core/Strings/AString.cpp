@@ -138,23 +138,7 @@ AString::~AString()
 //------------------------------------------------------------------------------
 bool AString::operator == ( const char * other ) const
 {
-    const char * thisPos = m_Contents;
-    const char * otherPos = other;
-
-loop:
-    char c1 = *thisPos;
-    char c2 = *otherPos;
-    if ( c1 != c2 )
-    {
-        return false;
-    }
-    if ( c1 == '\000' )
-    {
-        return true;
-    }
-    thisPos++;
-    otherPos++;
-    goto loop;
+    return ( strcmp( m_Contents, other ) == 0 );
 }
 
 // operator == (const AString &)
@@ -166,7 +150,7 @@ bool AString::operator == ( const AString & other ) const
         return false;
     }
 
-    return ( *this == other.Get() );
+    return ( memcmp( m_Contents, other.Get(), GetLength() ) == 0 );
 }
 
 // Compare
@@ -1285,17 +1269,9 @@ test_match:
 //------------------------------------------------------------------------------
 /*static*/ void AString::Copy( const char * src, char * dst )
 {
-    for (;;)
-    {
-        const char c = *src;
-        *dst = c; // Includes the null terminator
-        if ( c == 0 )
-        {
-            break;
-        }
-        ++dst;
-        ++src;
-    }
+PRAGMA_DISABLE_PUSH_MSVC( 4996 ) // C standard library is deprecated apparently
+    strcpy( dst, src );
+PRAGMA_DISABLE_POP_MSVC
 }
 
 // Copy
@@ -1317,26 +1293,7 @@ test_match:
 //------------------------------------------------------------------------------
 /*static*/ int32_t AString::StrNCmp( const char * a, const char * b, size_t num )
 {
-    while ( num > 0 )
-    {
-        if ( *a == *b )
-        {
-            if ( *a == '\000' )
-            {
-                return 0; // both strings ended and equal
-            }
-
-            // keep going
-            a++;
-            b++;
-            num--;
-            continue;
-        }
-
-        // different, so return relationship
-        return ( *a > *b ) ? 1 : -1;
-    };
-    return 0; // strings identical upto 'num' chars
+    return strncmp( a, b, num );
 }
 
 // StrNCmpI
