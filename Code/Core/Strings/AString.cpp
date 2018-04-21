@@ -91,7 +91,7 @@ AString::AString( const char * string )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
-    Copy( string, m_Contents ); // copy handles terminator
+    Copy( string, m_Contents, len ); // copy handles terminator
 }
 
 // CONSTRUCTOR (const char *, const char *)
@@ -514,7 +514,7 @@ AString & AString::operator += ( const char * string )
             Grow( newLen );
         }
 
-        Copy( string, m_Contents + m_Length ); // handles terminator
+        Copy( string, m_Contents + m_Length, suffixLen ); // handles terminator
         m_Length += suffixLen;
     }
     return *this;
