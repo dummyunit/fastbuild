@@ -1332,12 +1332,7 @@ test_match:
 //------------------------------------------------------------------------------
 /*static*/ size_t AString::StrLen( const char * string )
 {
-    const char * pos = string;
-    while ( *pos != '\000' )
-    {
-        pos++;
-    }
-    return (size_t)( pos - string );
+    return strlen( string );
 }
 
 // StrNCmp
