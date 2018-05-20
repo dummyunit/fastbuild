@@ -61,6 +61,7 @@ public:
 
     void DisplayTargetList() const;
     bool DisplayDependencyDB( const Array< AString > & targets ) const;
+    bool GenerateCompilationDB( const Array< AString > & targets ) const;
 
     class EnvironmentVarAndHash
     {

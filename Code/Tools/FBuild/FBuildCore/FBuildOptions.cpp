@@ -269,6 +269,11 @@ FBuildOptions::OptionsResult FBuildOptions::ProcessCommandLine( int argc, char *
                 m_DisplayTargetList = true;
                 continue;
             }
+            else if ( thisArg == "-compdb" )
+            {
+                m_GenerateCompilationDB = true;
+                continue;
+            }
             else if ( thisArg == "-summary" )
             {
                 m_ShowSummary = true;
@@ -503,6 +508,7 @@ void FBuildOptions::DisplayHelp( const AString & programName ) const
             " -showcmds      Show command lines used to launch external processes.\n"
             " -showdeps      Show known dependency tree for specified targets.\n"
             " -showtargets   Display list of primary build targets.\n"
+            " -compdb        Generate JSON compilation database for specified targets.\n"
             " -summary       Show a summary at the end of the build.\n"
             " -verbose       Show detailed diagnostic information. This will slow\n"
             "                down building.\n"
