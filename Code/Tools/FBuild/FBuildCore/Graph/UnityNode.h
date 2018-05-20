@@ -52,6 +52,9 @@ public:
 
     static Node * Load( NodeGraph & nodeGraph, IOStream & stream );
     virtual void Save( IOStream & stream ) const override;
+
+    void EnumerateInputFiles( void (*callback)( const AString & inputFile, const AString & baseDir, void * userData ), void * userData ) const;
+
 private:
     virtual BuildResult DoBuild( Job * job ) override;
 
