@@ -1,0 +1,68 @@
+all: fbuild fbuildworker
+tests: coretest fbuildtest
+
+uname_s := $(shell uname -s)
+lz4_dir := $(dir $(firstword $(wildcard ../External/LZ4/*/lz4.h ../External/LZ4/*/lib/lz4.h)))
+
+extra_cflags := -I./ -I$(lz4_dir) -DRELEASE
+ifeq ($(uname_s),Linux)
+	extra_cflags += -D__LINUX__
+	libs := -lpthread -lrt -ldl
+endif
+ifeq ($(uname_s),Darwin)
+	extra_cflags += -D__APPLE__ -D__OSX__
+endif
+
+Core_OBJS = $(patsubst %.cpp,%.o, $(patsubst %.c,%.o, \
+	$(filter-out Core/CoreTest%, \
+		$(wildcard Core/*/*.cpp) \
+		$(wildcard Core/*/*/*.cpp) \
+	) \
+	$(lz4_dir)lz4.c \
+	$(lz4_dir)xxhash.c \
+))
+CoreTest_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard Core/CoreTest/*.cpp) \
+	$(wildcard Core/CoreTest/*/*.cpp) \
+)
+TestFramework_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard TestFramework/*.cpp) \
+)
+OSUI_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard OSUI/*.cpp) \
+)
+FBuildCore_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard Tools/FBuild/FBuildCore/*.cpp) \
+	$(wildcard Tools/FBuild/FBuildCore/*/*.cpp) \
+	$(wildcard Tools/FBuild/FBuildCore/*/*/*.cpp) \
+)
+FBuildApp_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard Tools/FBuild/FBuildApp/*.cpp) \
+)
+FBuildWorker_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard Tools/FBuild/FBuildWorker/*.cpp) \
+	$(wildcard Tools/FBuild/FBuildWorker/*/*.cpp) \
+)
+FBuildTest_OBJS = $(patsubst %.cpp,%.o, \
+	$(wildcard Tools/FBuild/FBuildTest/*.cpp) \
+	$(wildcard Tools/FBuild/FBuildTest/Tests/*.cpp) \
+)
+
+%.o : %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(extra_cflags) -c -o $@ $<
+%.o : %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(extra_cflags) -std=c++11 -Wno-invalid-offsetof -c -o $@ $<
+
+coretest: $(Core_OBJS) $(TestFramework_OBJS) $(CoreTest_OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(libs)
+fbuild: $(Core_OBJS) $(FBuildCore_OBJS) $(FBuildApp_OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(libs)
+fbuildworker: $(Core_OBJS) $(OSUI_OBJS) $(FBuildCore_OBJS) $(FBuildWorker_OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(libs)
+fbuildtest: $(Core_OBJS) $(TestFramework_OBJS) $(FBuildCore_OBJS) $(FBuildTest_OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(libs)
+
+clean:
+	@-rm -- $(Core_OBJS) $(CoreTest_OBJS) $(TestFramework_OBJS) $(OSUI_OBJS) $(FBuildCore_OBJS) $(FBuildApp_OBJS) $(FBuildWorker_OBJS) $(FBuildTest_OBJS) 2>/dev/null
+
+.PHONY: all tests clean
