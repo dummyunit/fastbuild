@@ -1,0 +1,70 @@
+language: cpp
+
+matrix:
+  include:
+    # Linux, default compilers
+    - os: linux
+    # Linux, latest supported compilers
+    - os: linux
+      env: GCC=gcc-6 CLANG=clang-6.0
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - gcc-6
+            - g++-6
+            - clang-6.0
+    # Linux, AddressSanitizer
+    - os: linux
+      env: CFG=asan
+      sudo: true # LeakSanitizer doesn't work inside Travis containers, see https://github.com/travis-ci/travis-ci/issues/9033
+    # Linux, MemorySanitizer
+    - os: linux
+      env: CFG=msan
+    # OSX, default compilers, disabled because some tests in CoreTest are consistently failing, and FBuildTest times out
+    #- os: osx
+    #  compiler: clang
+  allow_failures:
+    - env: CFG=asan
+    - env: CFG=msan
+    - os: osx
+  fast_finish: true
+
+script:
+  - cd Code
+  # Set up some variables for convenience
+  - export NPROC=$(if [[ "${TRAVIS_OS_NAME}" == osx ]]; then sysctl -n hw.ncpu; else nproc; fi)
+  - export MAKE_CMD="make -j${NPROC}"
+  - export FBUILD_CMD="./fbuild -j${NPROC} -noprogress"
+  - export GCC=${GCC:-gcc} CLANG=${CLANG:-clang}
+  - export GXX=${GCC/gcc/g++} CLANGXX=${CLANG/clang/clang++}
+  # Patch configs to use installed compilers
+  - |
+    sed -ie "1i\\
+    #define CI_BUILD
+    s:CI_GCC_BINARY:$(which ${GCC}):
+    s:CI_GXX_BINARY:$(which ${GXX}):
+    s:CI_CC1_BINARY:$(${GCC} -print-prog-name=cc1):
+    s:CI_CC1PLUS_BINARY:$(${GCC} -print-prog-name=cc1plus):
+    s:CI_CLANG_BINARY:$(which ${CLANG}):
+    s:CI_CLANGXX_BINARY:$(which ${CLANGXX}):" fbuild.bff Tools/FBuild/FBuildTest/Data/testcommon.bff
+  # Bootstrap fbuild using Makefile
+  - ${MAKE_CMD} -s -f Makefile.bootstrap fbuild
+  # Run tests in the selected configuration
+  - |
+    case "${TRAVIS_OS_NAME}:${CFG}" in
+      linux:)
+        ${FBUILD_CMD} {CoreTest,FBuildTest}-RunTest-x64Linux-Debug CoreTest-RunTest-x64Linux-Release
+        ;;
+      osx:)
+        ${FBUILD_CMD} {CoreTest,FBuildTest}-RunTest-x64OSX-Debug CoreTest-RunTest-x64OSX-Release
+        ;;
+      linux:asan)
+        ${FBUILD_CMD} {CoreTest,FBuildTest}-RunTest-x64ClangLinux-ASan
+        ;;
+      linux:msan)
+        ${FBUILD_CMD} {CoreTest,FBuildTest}-RunTest-x64ClangLinux-MSan
+        ;;
+    esac

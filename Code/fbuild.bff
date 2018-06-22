@@ -44,10 +44,23 @@ Compiler( 'Compiler-x64-Linux' )
                         '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1'
                         '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1plus'
                       }
+    #if CI_BUILD
+          .CompilerFamily = 'gcc'
+          .Executable     = 'CI_GCC_BINARY'
+          .ExtraFiles     = {
+                              '/usr/bin/as'
+                              'CI_CC1_BINARY'
+                              'CI_CC1PLUS_BINARY'
+                            }
+    #endif
 }
 Compiler( 'Compiler-x64Clang-LinuxOSX' )
 {
     .Executable = '/usr/bin/clang++'
+    #if CI_BUILD
+        .CompilerFamily = 'clang'
+        .Executable     = 'CI_CLANG_BINARY'
+    #endif
 }
 
 //------------------------------------------------------------------------------
@@ -330,6 +343,9 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     .Platform               = 'x64Linux'
     .Compiler               = 'Compiler-x64-Linux'
     .Linker                 = '/usr/bin/g++'
+    #if CI_BUILD
+        .Linker             = 'CI_GXX_BINARY'
+    #endif
 ]
 .X64DebugConfig_Linux       = .X64BaseConfig_Linux
                             + .Debug_Config
@@ -349,6 +365,9 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     .Platform               = 'x64ClangLinux'
     .Compiler               = 'Compiler-x64Clang-LinuxOSX'
     .Linker                 = '/usr/bin/clang++'
+    #if CI_BUILD
+        .Linker             = 'CI_CLANGXX_BINARY'
+    #endif
 ]
 .X64ClangDebugConfig_Linux  = .X64ClangBaseConfig_Linux
                             + .Debug_Config
@@ -375,6 +394,9 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
     .Compiler               = 'Compiler-x64Clang-LinuxOSX'
     .Librarian              = '/usr/bin/ar'
     .Linker                 = '/usr/bin/g++'
+    #if CI_BUILD
+        .Linker             = 'CI_CLANGXX_BINARY'
+    #endif
 
     .CompilerOptions        = '-x c++ -o "%2" "%1" -c -g'
                             + ' -I./'
@@ -429,6 +451,9 @@ Compiler( 'Compiler-x64Clang-LinuxOSX' )
 //------------------------------------------------------------------------------
 #if !BUILDING_FROM_TESTS
     .UnityInputIsolateWritableFiles = true
+    #if CI_BUILD
+        .UnityInputIsolateWritableFiles = false
+    #endif
 #endif
 #if __WINDOWS__
     .UnityOutputBase = '$OutputBase$\Unity-Windows'
@@ -558,9 +583,11 @@ ForEach( .Config in .ConfigsAll )
                             'FBuildWorker-$Platform$-$Config$'
                           }
 #if __LINUX__
+    #if !CI_BUILD
         .Targets        + { // libFuzzer targets
                             'BFFFuzzer-$Platform$-$Config$'
                           }
+    #endif
 #endif
     }
 }

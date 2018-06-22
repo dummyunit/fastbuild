@@ -62,10 +62,22 @@
                             '/usr/bin/as'
                             '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1plus'
                           }
+        #if CI_BUILD
+            .CompilerFamily = 'gcc'
+            .Executable     = 'CI_GCC_BINARY'
+            .ExtraFiles     = {
+                                '/usr/bin/as'
+                                'CI_CC1_BINARY'
+                                'CI_CC1PLUS_BINARY'
+                              }
+        #endif
     }
     .CompilerDist       = 'Compiler-GCC-Dist'
     .Librarian          = '/usr/bin/ar'
     .Linker             = '/usr/bin/g++'
+    #if CI_BUILD
+        .Linker         = 'CI_GXX_BINARY'
+    #endif
 
     .BaseCompilerOptions= ' -o "%2" "%1" -c -g'
                         + ' -I./'
@@ -97,10 +109,17 @@
     Compiler( 'Compiler-Clang-Dist' )
     {
         .Executable     = '/usr/bin/clang++'
+        #if CI_BUILD
+            .CompilerFamily = 'clang'
+            .Executable = 'CI_CLANGXX_BINARY'
+        #endif
     }
     .CompilerDist       = 'Compiler-Clang-Dist'
     .Librarian          = '/usr/bin/ar'
     .Linker             = '/usr/bin/g++'
+    #if CI_BUILD
+        .Linker         = 'CI_CLANGXX_BINARY'
+    #endif
 
     .BaseCompilerOptions= ' -o "%2" "%1" -c -g'
                         + ' -I./'
