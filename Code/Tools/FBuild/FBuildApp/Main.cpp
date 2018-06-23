@@ -233,10 +233,9 @@ int Main(int argc, char * argv[])
 int WrapperMainProcess( const AString & args, const FBuildOptions & options, SystemMutex & finalProcess )
 {
     // Create SharedMemory to communicate between Main and Final process
-    SharedMemory sm;
     g_SharedMemory.Create( options.GetSharedMemoryName().Get(), sizeof( SharedData ) );
-    SharedData * sd = (SharedData *)g_SharedMemory.GetPtr();
-    memset( sd, 0, sizeof( SharedData ) );
+    memset( g_SharedMemory.GetPtr(), 0, sizeof( SharedData ) );
+    volatile SharedData * sd = static_cast< SharedData * >( g_SharedMemory.GetPtr() );
     sd->ReturnCode = FBUILD_WRAPPER_CRASHED;
 
     // launch intermediate process

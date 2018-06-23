@@ -63,7 +63,7 @@ void TestSharedMemory::CreateAccessDestroy() const
     {
         SharedMemory shm;
         shm.Open(sharedMemoryName.Get(), sizeof(unsigned int));
-        unsigned int* magic = static_cast<unsigned int*>(shm.GetPtr());
+        volatile unsigned int * magic = static_cast< unsigned int * >( shm.GetPtr() );
 
         // Asserts raise an exception when running unit tests : forked process
         // will not exit cleanly and it will be ASSERTed in the parent process.
@@ -84,7 +84,7 @@ void TestSharedMemory::CreateAccessDestroy() const
     {
         SharedMemory shm;
         shm.Create(sharedMemoryName.Get(), sizeof(unsigned int));
-        unsigned int* magic = static_cast<unsigned int*>(shm.GetPtr());
+        volatile unsigned int * magic = static_cast< unsigned int * >( shm.GetPtr() );
         TEST_ASSERT( magic );
 
         // Signal child
