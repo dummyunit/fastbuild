@@ -208,7 +208,7 @@ void ToolManifest::Deserialize( IOStream & ms, bool remote )
         GetRemoteFilePath( (uint32_t)i, localFile );
 
         // is this file already present?
-        AutoPtr< FileStream > fileStream( FNEW( FileStream ) );
+        AutoPtr< FileStream, DeleteDeletor > fileStream( FNEW( FileStream ) );
         FileStream & f = *( fileStream.Get() );
         if ( f.Open( localFile.Get() ) == false )
         {
@@ -436,7 +436,7 @@ bool ToolManifest::ReceiveFileData( uint32_t fileId, const void * data, size_t &
     #endif
 
     // open read-only
-    AutoPtr< FileStream > fileStream( FNEW( FileStream ) );
+    AutoPtr< FileStream, DeleteDeletor > fileStream( FNEW( FileStream ) );
     if ( fileStream.Get()->Open( fileName.Get(), FileStream::READ_ONLY ) == false )
     {
         return false; // FAILED
