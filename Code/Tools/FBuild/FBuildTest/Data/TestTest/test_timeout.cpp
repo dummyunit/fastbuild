@@ -8,4 +8,5 @@ int main(int , char **)
     {
         // busy wait spin to avoid pulling dependencies for sleep/yield
     }
+    return 0;
 }
