@@ -28,7 +28,7 @@ class ToolManifest;
 class Server : public TCPConnectionPool
 {
 public:
-    Server( uint32_t numThreadsInJobQueue = 0 );
+    explicit Server( uint32_t numThreadsInJobQueue = 0 );
     ~Server();
 
     static void GetHostForJob( const Job * job, AString & hostName );

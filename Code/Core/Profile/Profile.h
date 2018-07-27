@@ -28,7 +28,7 @@
     class ProfileHelper
     {
     public:
-        inline ProfileHelper( const char * id )
+        explicit inline ProfileHelper( const char * id )
         {
             ProfileManager::Start( id );
         }
