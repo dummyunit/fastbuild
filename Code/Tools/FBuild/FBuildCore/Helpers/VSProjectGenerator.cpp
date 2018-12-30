@@ -169,8 +169,8 @@ const AString & VSProjectGenerator::GenerateVCXProj( const AString & projectFile
                 const char * pipe = proj.Find( '|' );
                 if ( pipe )
                 {
-                    proj.SetLength( (uint32_t)( pipe - proj.Get() ) );
                     AStackString<> guid( pipe + 1 );
+                    proj.SetLength( (uint32_t)( pipe - proj.Get() ) );
                     WriteF("    <ProjectReference Include=\"%s\">\n", proj.Get() );
                     WriteF("      <Project>%s</Project>\n", guid.Get() );
                     Write( "    </ProjectReference>\n" );

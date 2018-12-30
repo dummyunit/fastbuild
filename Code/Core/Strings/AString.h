@@ -171,6 +171,7 @@ protected:
     }
     NO_INLINE void Grow( uint32_t newLen );     // Grow capacity, transferring existing string data (for concatenation)
     NO_INLINE void GrowNoCopy( uint32_t newLen ); // Grow capacity, discarding existing string data (for assignment/construction)
+    void PoisonReserved();
 
     char *      m_Contents;         // always points to valid null terminated string (even when empty)
     uint32_t    m_Length;           // length in characters

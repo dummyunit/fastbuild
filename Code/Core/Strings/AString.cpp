@@ -12,6 +12,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if !defined( __has_feature )
+    #define __has_feature( ... ) 0
+#endif
+#if __has_feature( memory_sanitizer )
+    extern "C" void __msan_poison( const volatile void * data, size_t size );
+#endif
+
 // Static
 //------------------------------------------------------------------------------
 /*static*/ const char * const AString::s_EmptyString( "" );
@@ -40,6 +47,7 @@ AString::AString( uint32_t reserve )
     m_Contents = mem;
     m_Length = 0;
     SetReserved( reserve, true );
+    PoisonReserved();
 }
 
 // CONSTRUCTOR (const AString &)
@@ -51,6 +59,7 @@ AString::AString( const AString & string )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    PoisonReserved();
     Copy( string.Get(), m_Contents, len ); // handles terminator (NOTE: Using len to support embedded nuls)
 }
 
@@ -91,6 +100,7 @@ AString::AString( const char * string )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    PoisonReserved();
     Copy( string, m_Contents, len ); // copy handles terminator
 }
 
@@ -105,6 +115,7 @@ AString::AString( const char * start, const char * end )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    PoisonReserved();
     Copy( start, m_Contents, len ); // copy handles terminator
 }
 
@@ -372,6 +383,7 @@ void AString::Assign( const char * start, const char * end )
     }
     Copy( start, m_Contents, len ); // handles terminator
     m_Length = len;
+    PoisonReserved();
 }
 
 // Assign (const AString &)
@@ -391,6 +403,7 @@ void AString::Assign( const AString & string )
     }
     Copy( string.Get(), m_Contents, len ); // handles terminator (NOTE: Using len to support embedded nuls)
     m_Length = len;
+    PoisonReserved();
 }
 
 // Assign (AString &&)
@@ -433,6 +446,7 @@ void AString::Clear()
     // truncate, but don't free the memory
     m_Contents[ 0 ] = '\000';
     m_Length = 0;
+    PoisonReserved();
 }
 
 // SetReserved
@@ -465,6 +479,7 @@ void AString::SetLength( uint32_t len )
         m_Contents[ len ] = '\000';
     }
     m_Length = len;
+    PoisonReserved();
 
     // NOTE: it's up to the user to ensure everything upto the null is
     // valid
@@ -1351,6 +1366,7 @@ void AString::Grow( uint32_t newLength )
 
     m_Contents = newMem;
     SetReserved( reserve, true );
+    PoisonReserved();
 }
 
 // GrowNoCopy
@@ -1366,6 +1382,16 @@ void AString::GrowNoCopy( uint32_t newLength )
     uint32_t reserve = Math::RoundUp( newLength, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserve + 1 ); // also allocate for \0 terminator
     SetReserved( reserve, true );
+    PoisonReserved();
+}
+
+// PoisonReserved
+//------------------------------------------------------------------------------
+inline void AString::PoisonReserved()
+{
+    #if __has_feature( memory_sanitizer )
+        __msan_poison( GetEnd() + 1, GetReserved() - GetLength() );
+    #endif
 }
 
 //------------------------------------------------------------------------------
