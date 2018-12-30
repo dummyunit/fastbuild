@@ -9,15 +9,17 @@
     //--------------------------------------------------------------------------
     #if USING_CLANG_6
         // These options are valid for Clang >= 6.0.0:
+        .ExtraLinkerOptions_Debug = ' -fsanitize=fuzzer'
         .ExtraLinkerOptions_ASan = ' -fsanitize=fuzzer'
         .ExtraLinkerOptions_MSan = ' -lFuzzer -nodefaultlibs -Wl,-Bstatic -lc++ -Wl,-Bdynamic -lc++abi -lunwind -lpthread -lc -lrt -ldl -lm'
     #else
         // These options are a valid for Clang < 6.0.0:
+        .ExtraLinkerOptions_Debug = ' -lFuzzer'
         .ExtraLinkerOptions_ASan = ' -lFuzzer'
         .ExtraLinkerOptions_MSan = ' -lFuzzer -nodefaultlibs -Wl,-Bstatic -lc++ -Wl,-Bdynamic -lc++abi -lunwind -lpthread -lc -lrt -ldl -lm'
     #endif
 
-    .MyBuildConfigs = { .X64ClangASanConfig_Linux , .X64ClangMSanConfig_Linux }
+    .MyBuildConfigs = { .X64ClangDebugConfig_Linux, .X64ClangASanConfig_Linux, .X64ClangMSanConfig_Linux }
     ForEach( .BuildConfig in .MyBuildConfigs )
     {
         Using( .BuildConfig )
@@ -64,10 +66,11 @@
     // Aliases
     //--------------------------------------------------------------------------
     // Per-Config
+    Alias( '$ProjectName$-Debug' )           { .Targets = { '$ProjectName$-X64ClangLinux-Debug' } }
     Alias( '$ProjectName$-ASan' )            { .Targets = { '$ProjectName$-X64ClangLinux-ASan' } }
     Alias( '$ProjectName$-MSan' )            { .Targets = { '$ProjectName$-X64ClangLinux-MSan' } }
 
     // Per-Platform
-    Alias( '$ProjectName$-X64ClangLinux' )   { .Targets = { '$ProjectName$-X64ClangLinux-ASan' , '$ProjectName$-X64ClangLinux-MSan' } }
+    Alias( '$ProjectName$-X64ClangLinux' )   { .Targets = { '$ProjectName$-X64ClangLinux-Debug', '$ProjectName$-X64ClangLinux-ASan', '$ProjectName$-X64ClangLinux-MSan' } }
 }
 #endif
