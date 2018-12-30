@@ -40,6 +40,7 @@ AString::AString( uint32_t reserve )
     m_Contents = mem;
     m_Length = 0;
     SetReserved( reserve, true );
+    AnnotateAlloc( 0 );
 }
 
 // CONSTRUCTOR (const AString &)
@@ -51,6 +52,7 @@ AString::AString( const AString & string )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    AnnotateAlloc( len );
     Copy( string.Get(), m_Contents, len ); // handles terminator (NOTE: Using len to support embedded nuls)
 }
 
@@ -64,6 +66,7 @@ AString::AString( const char * string )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    AnnotateAlloc( len );
     Copy( string, m_Contents ); // copy handles terminator
 }
 
@@ -78,6 +81,7 @@ AString::AString( const char * start, const char * end )
     uint32_t reserved = Math::RoundUp( len, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserved + 1 );
     SetReserved( reserved, true );
+    AnnotateAlloc( len );
     Copy( start, m_Contents, len ); // copy handles terminator
 }
 
@@ -85,6 +89,7 @@ AString::AString( const char * start, const char * end )
 //------------------------------------------------------------------------------
 AString::~AString()
 {
+    AnnotateFree();
     // At this point, we should
     if ( MemoryMustBeFreed() )
     {
@@ -359,7 +364,9 @@ void AString::Assign( const char * start, const char * end )
         // didn't resize then the passed in string is empty too
         return;
     }
+    AnnotateResize( m_Length, Math::Max( m_Length, len ) ); // This is needed in the case of partial self assignment
     Copy( start, m_Contents, len ); // handles terminator
+    AnnotateResize( m_Length, len );
     m_Length = len;
 }
 
@@ -378,6 +385,7 @@ void AString::Assign( const AString & string )
         // didn't resize then the passed in string is empty too
         return;
     }
+    AnnotateResize( m_Length, len );
     Copy( string.Get(), m_Contents, len ); // handles terminator (NOTE: Using len to support embedded nuls)
     m_Length = len;
 }
@@ -392,6 +400,7 @@ void AString::Clear()
         return;
     }
 
+    AnnotateResize( m_Length, 0 );
     // truncate, but don't free the memory
     m_Contents[ 0 ] = '\000';
     m_Length = 0;
@@ -424,6 +433,7 @@ void AString::SetLength( uint32_t len )
     // global storage.
     if ( m_Contents != s_EmptyString )
     {
+        AnnotateResize( m_Length, len );
         m_Contents[ len ] = '\000';
     }
     m_Length = len;
@@ -441,6 +451,7 @@ AString & AString::operator += ( char c )
     {
         Grow( m_Length + 1 );
     }
+    AnnotateResize( m_Length, m_Length + 1 );
     m_Contents[ m_Length++ ] = c;
     m_Contents[ m_Length ] = '\000';
 
@@ -461,6 +472,7 @@ AString & AString::operator += ( const char * string )
         }
 
         Copy( string, m_Contents + m_Length ); // handles terminator
+        AnnotateResize( m_Length, newLen );
         m_Length += suffixLen;
     }
     return *this;
@@ -479,6 +491,7 @@ AString & AString::operator += ( const AString & string )
             Grow( newLen );
         }
 
+        AnnotateResize( m_Length, newLen );
         Copy( string.Get(), m_Contents + m_Length, suffixLen ); // handles terminator (NOTE: Using suffixLen to support embedded nuls)
         m_Length += suffixLen;
     }
@@ -497,6 +510,7 @@ AString & AString::Append( const char * string, size_t len )
             Grow( newLen );
         }
 
+        AnnotateResize( m_Length, newLen );
         Copy( string, m_Contents + m_Length, len ); // handles terminator
         m_Length = newLen;
     }
@@ -578,6 +592,8 @@ void AString::ToUpper()
     }
 }
 
+    AnnotateResize( m_Length, m_Length + extraSpace );
+    AnnotateResize( end - m_Contents, m_Length );
 // Trim
 //------------------------------------------------------------------------------
 void AString::Trim( uint32_t startCharsToTrim, uint32_t endCharsToTrim )
@@ -1314,6 +1330,7 @@ void AString::Grow( uint32_t newLength )
     // transfer existing string data
     Copy( m_Contents, newMem, m_Length ); // copy handles terminator
 
+    AnnotateFree();
     if ( MemoryMustBeFreed() )
     {
         FREE( m_Contents );
@@ -1321,12 +1338,14 @@ void AString::Grow( uint32_t newLength )
 
     m_Contents = newMem;
     SetReserved( reserve, true );
+    AnnotateAlloc( m_Length );
 }
 
 // GrowNoCopy
 //------------------------------------------------------------------------------
 void AString::GrowNoCopy( uint32_t newLength )
 {
+    AnnotateFree();
     if ( MemoryMustBeFreed() )
     {
         FREE( m_Contents );
@@ -1336,6 +1355,35 @@ void AString::GrowNoCopy( uint32_t newLength )
     uint32_t reserve = Math::RoundUp( newLength, (uint32_t)2 );
     m_Contents = (char *)ALLOC( reserve + 1 ); // also allocate for \0 terminator
     SetReserved( reserve, true );
+    AnnotateAlloc( 0 );
 }
+
+#if __has_feature( address_sanitizer ) || __SANITIZE_ADDRESS__
+
+// Declared in <sanitizers/common_interface_defs.h>
+extern "C" void __sanitizer_annotate_contiguous_container( const void * beg, const void * end, const void * old_mid, const void * new_mid );
+
+// AnnotateAlloc
+//------------------------------------------------------------------------------
+void AString::AnnotateAlloc( uint32_t size )
+{
+    __sanitizer_annotate_contiguous_container( Get(), Get() + GetReserved() + 1, Get() + GetReserved() + 1, Get() + size + 1 );
+}
+
+// AnnotateFree
+//------------------------------------------------------------------------------
+void AString::AnnotateFree()
+{
+    __sanitizer_annotate_contiguous_container( Get(), Get() + GetReserved() + 1, GetEnd() + 1, Get() + GetReserved() + 1 );
+}
+
+// AnnotateResize
+//------------------------------------------------------------------------------
+void AString::AnnotateResize( uint32_t oldSize, uint32_t newSize )
+{
+    __sanitizer_annotate_contiguous_container( Get(), Get() + GetReserved() + 1, Get() + oldSize + 1, Get() + newSize + 1 );
+}
+
+#endif
 
 //------------------------------------------------------------------------------

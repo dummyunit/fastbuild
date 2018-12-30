@@ -18,6 +18,10 @@
     #endif
 #endif
 
+#if !defined( __has_feature )
+    #define __has_feature( ... ) 0
+#endif
+
 // AString
 //------------------------------------------------------------------------------
 class AString
@@ -164,6 +168,16 @@ protected:
     }
     NO_INLINE void Grow( uint32_t newLen );     // Grow capacity, transferring existing string data (for concatenation)
     NO_INLINE void GrowNoCopy( uint32_t newLen ); // Grow capacity, discarding existing string data (for assignment/construction)
+
+    #if __has_feature( address_sanitizer ) || __SANITIZE_ADDRESS__
+        void AnnotateAlloc( uint32_t size );
+        void AnnotateFree();
+        void AnnotateResize( uint32_t oldSize, uint32_t newSize );
+    #else
+        inline void AnnotateAlloc( uint32_t size ) { (void)size; }
+        inline void AnnotateFree() {}
+        inline void AnnotateResize( uint32_t oldSize, uint32_t newSize ) { (void)oldSize; (void)newSize; }
+    #endif
 
     char *      m_Contents;         // always points to valid null terminated string (even when empty)
     uint32_t    m_Length;           // length in characters
