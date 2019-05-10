@@ -40,7 +40,7 @@ public:
     const AString& GetArgs() const { return m_Args; }
 
     // Basic Args
-    AString     m_ProgramName;
+    AString     m_ProgramPath;
     AString     m_Args; // Stored copy of args
     WrapperMode m_WrapperMode                       = WRAPPER_MODE_NONE;
 

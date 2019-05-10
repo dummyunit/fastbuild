@@ -248,7 +248,7 @@ int WrapperMainProcess( const AString & args, const FBuildOptions & options, Sys
     argsCopy += " -wrapperintermediate";
 
     Process p;
-    if ( !p.Spawn( options.m_ProgramName.Get(), argsCopy.Get(), options.GetWorkingDir().Get(), nullptr, true ) ) // true = forward output to our tty
+    if ( !p.Spawn( options.m_ProgramPath.Get(), argsCopy.Get(), options.GetWorkingDir().Get(), nullptr, true ) ) // true = forward output to our tty
     {
         return FBUILD_FAILED_TO_SPAWN_WRAPPER;
     }
@@ -285,7 +285,7 @@ int WrapperIntermediateProcess( const FBuildOptions & options )
     argsCopy += " -wrapperfinal";
 
     Process p;
-    if ( !p.Spawn( options.m_ProgramName.Get(), argsCopy.Get(), options.GetWorkingDir().Get(), nullptr, true ) ) // true = forward output to our tty
+    if ( !p.Spawn( options.m_ProgramPath.Get(), argsCopy.Get(), options.GetWorkingDir().Get(), nullptr, true ) ) // true = forward output to our tty
     {
         return FBUILD_FAILED_TO_SPAWN_WRAPPER_FINAL;
     }

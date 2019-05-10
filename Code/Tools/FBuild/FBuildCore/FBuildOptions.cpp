@@ -42,16 +42,29 @@ FBuildOptions::FBuildOptions()
 //------------------------------------------------------------------------------
 FBuildOptions::OptionsResult FBuildOptions::ProcessCommandLine( int argc, char * argv[] )
 {
-    // Store executable name
-    AStackString<> programName( "FBuild.exe" );
+    // Store executable path
+    AStackString<> programName;
     if ( argc > 0 )
     {
-        AStackString<> programPath( argv[0] );
-        if ( !programPath.IsEmpty() )
+        m_ProgramPath = argv[0];
+        if ( !m_ProgramPath.IsEmpty() )
         {
-            const char* slash = programPath.FindLast( NATIVE_SLASH );
-            programName = ( slash ? slash + 1 : programPath.Get() );
+            const char* slash = m_ProgramPath.FindLast( NATIVE_SLASH );
+            programName = ( slash ? slash + 1 : m_ProgramPath.Get() );
         }
+    }
+    else
+    {
+        #if defined( __WINDOWS__ )
+            programName = "FBuild.exe";
+        #elif defined( __APPLE__ )
+            programName = "FBuild";
+        #elif defined( __LINUX__ )
+            programName = "fbuild";
+        #else
+            #error Unknown platform
+        #endif
+        m_ProgramPath = programName;
     }
 
     bool progressOptionSpecified = false;
@@ -186,8 +199,8 @@ FBuildOptions::OptionsResult FBuildOptions::ProcessCommandLine( int argc, char *
                 progressOptionSpecified = true;
                 #if defined( __WINDOWS__ )
                     m_FixupErrorPaths = true;
-                    m_WrapperMode = WRAPPER_MODE_MAIN_PROCESS;
                 #endif
+                m_WrapperMode = WRAPPER_MODE_MAIN_PROCESS;
                 continue;
             }
             PRAGMA_DISABLE_PUSH_MSVC( 4996 ) // This function or variable may be unsafe...
@@ -300,23 +313,17 @@ FBuildOptions::OptionsResult FBuildOptions::ProcessCommandLine( int argc, char *
             }
             else if ( thisArg == "-wrapper")
             {
-                #if defined( __WINDOWS__ )
-                    m_WrapperMode = WRAPPER_MODE_MAIN_PROCESS;
-                #endif
+                m_WrapperMode = WRAPPER_MODE_MAIN_PROCESS;
                 continue;
             }
             else if ( thisArg == "-wrapperintermediate") // Internal use only
             {
-                #if defined( __WINDOWS__ )
-                    m_WrapperMode = WRAPPER_MODE_INTERMEDIATE_PROCESS;
-                #endif
+                m_WrapperMode = WRAPPER_MODE_INTERMEDIATE_PROCESS;
                 continue;
             }
             else if ( thisArg == "-wrapperfinal") // Internal use only
             {
-                #if defined( __WINDOWS__ )
-                    m_WrapperMode = WRAPPER_MODE_FINAL_PROCESS;
-                #endif
+                m_WrapperMode = WRAPPER_MODE_FINAL_PROCESS;
                 continue;
             }
 
@@ -379,7 +386,6 @@ FBuildOptions::OptionsResult FBuildOptions::ProcessCommandLine( int argc, char *
     }
 
     // Global mutex names depend on workingDir which is managed by FBuildOptions
-    m_ProgramName = programName;
 
     return OPTIONS_OK;
 }
