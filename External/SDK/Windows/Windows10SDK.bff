@@ -27,7 +27,7 @@
                                     + ' "-I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/um"'
                                     + ' "-I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/shared"'
 
-    .WindowsDK_WinRTAssemblyPath    = '$Windows10_SDKBasePath$/UnionMetadata/$Windows10_SDKVersion$/'
+    .WindowsDK_WinRTAssemblyPath    = '$Windows10_SDKBasePath$/UnionMetadata/'
 
     .CommonCompilerOptions          = .WindowsSDK_IncludePaths
                                     + .WindowsSDK_Defines
@@ -44,7 +44,7 @@
 ]
 Compiler( 'ResourceCompiler-Windows10' )
 {
-    .Executable                 = '$Windows10_SDKBasePath$/Bin/$Windows10_SDKVersion$/x64/RC.exe'
+    .Executable                 = '$Windows10_SDKBasePath$/Bin/x64/RC.exe'
     .CompilerFamily             = 'custom'
 }
 
