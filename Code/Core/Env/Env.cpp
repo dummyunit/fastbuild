@@ -8,7 +8,8 @@
 // Core
 #include "Core/Containers/Array.h"
 #include "Core/Mem/Mem.h"
-#include "Core/Strings/AStackString.h"
+#include "Core/Strings/AString.h"
+#include "Core/Strings/AStackString.h" // IWYU pragma: keep
 #include "Core/Process/Atomic.h"
 
 #if defined( __WINDOWS__ )
@@ -25,7 +26,8 @@
 #endif
 
 #if defined( __LINUX__ )
-    #include <linux/limits.h>
+    #include <limits.h>
+    #include <linux/limits.h> // IWYU pragma: keep
 #endif
 
 #if defined( __APPLE__ )

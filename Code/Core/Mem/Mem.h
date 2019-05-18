@@ -5,7 +5,7 @@
 // Includes
 //------------------------------------------------------------------------------
 #include "Core/Env/Types.h"
-#include "Core/Mem/MemTracker.h"
+#include "Core/Mem/MemTracker.h" // IWYU pragma: keep
 
 // Placement new/delete
 //------------------------------------------------------------------------------

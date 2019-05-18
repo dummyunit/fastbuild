@@ -4,7 +4,7 @@
 
 // Includes
 //------------------------------------------------------------------------------
-#include "Core/Env/Env.h"
+#include "Core/Env/Env.h" // IWYU pragma: keep
 #include "Core/Env/Types.h"
 #include "Core/Strings/AStackString.h"
 

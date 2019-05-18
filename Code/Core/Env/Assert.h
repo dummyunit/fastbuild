@@ -27,6 +27,8 @@ bool IsDebuggerAttached();
 #ifdef DEBUG
     #define ASSERTS_ENABLED
 
+    class AssertHandler;
+
     // Create a no-return helper to improve static analysis
     #if defined( __WINDOWS__ )
         __declspec(noreturn) void NoReturn();
