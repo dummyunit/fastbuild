@@ -7,6 +7,7 @@
 
 // Core
 #include "Core/Containers/Array.h"
+#include "Core/Mem/Mem.h"
 #include "Core/Strings/AStackString.h"
 #include "Core/Process/Atomic.h"
 

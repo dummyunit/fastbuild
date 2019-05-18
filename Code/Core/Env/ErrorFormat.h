@@ -5,6 +5,7 @@
 // Includes
 //------------------------------------------------------------------------------
 #include "Core/Env/Env.h"
+#include "Core/Env/Types.h"
 #include "Core/Strings/AStackString.h"
 
 // Forward Declarations
