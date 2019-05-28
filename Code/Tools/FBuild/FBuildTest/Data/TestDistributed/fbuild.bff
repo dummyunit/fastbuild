@@ -14,6 +14,23 @@ Library( "DistTest" )
     .CompilerOutputPath = "$Out$\Test\Distributed\"
 }
 
+Compiler( "GAS" )
+{
+    .Executable = '/usr/bin/as'
+    .CompilerFamily = 'custom'
+    .SimpleDistributionMode = true
+}
+
+Library( "DistTest_GAS" )
+{
+    .Compiler           = "GAS"
+    .CompilerOptions    = "%1 -o %2"
+    .LibrarianOutput    = "$Out$\Test\Distributed\dist_gas.lib"
+    .CompilerInputPath  = "Tools/FBuild/FBuildTest/Data/TestDistributed/"
+    .CompilerInputPattern = "*_weird.s"
+    .CompilerOutputPath = "$Out$\Test\Distributed\"
+}
+
 Library( "DistTestPCH" )
 {
     #if __WINDOWS__

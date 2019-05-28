@@ -30,6 +30,7 @@ private:
     void WithPCH() const;
     void RegressionTest_RemoteCrashOnErrorFormatting();
     void TestLocalRace();
+    void TestLocalRace_GAS();
     void RemoteRaceWinRemote();
     void AnonymousNamespaces();
     void ErrorsAreCorrectlyReported() const;
@@ -49,21 +50,22 @@ private:
 // Register Tests
 //------------------------------------------------------------------------------
 REGISTER_TESTS_BEGIN( TestDistributed )
-    REGISTER_TEST( TestWith1RemoteWorkerThread )
-    REGISTER_TEST( TestWith4RemoteWorkerThreads )
-    REGISTER_TEST( WithPCH )
-    REGISTER_TEST( RegressionTest_RemoteCrashOnErrorFormatting )
-    REGISTER_TEST( TestLocalRace )
-    REGISTER_TEST( RemoteRaceWinRemote )
-    REGISTER_TEST( AnonymousNamespaces )
-    REGISTER_TEST( ErrorsAreCorrectlyReported )
-    REGISTER_TEST( WarningsAreCorrectlyReported )
-    REGISTER_TEST( ShutdownMemoryLeak )
+    //REGISTER_TEST( TestWith1RemoteWorkerThread )
+    //REGISTER_TEST( TestWith4RemoteWorkerThreads )
+    //REGISTER_TEST( WithPCH )
+    //REGISTER_TEST( RegressionTest_RemoteCrashOnErrorFormatting )
+    //REGISTER_TEST( TestLocalRace )
+    REGISTER_TEST( TestLocalRace_GAS )
+    //REGISTER_TEST( RemoteRaceWinRemote )
+    //REGISTER_TEST( AnonymousNamespaces )
+    //REGISTER_TEST( ErrorsAreCorrectlyReported )
+    //REGISTER_TEST( WarningsAreCorrectlyReported )
+    //REGISTER_TEST( ShutdownMemoryLeak )
     #if defined( __WINDOWS__ )
-        REGISTER_TEST( TestForceInclude )
-        REGISTER_TEST( TestZiDebugFormat )
-        REGISTER_TEST( TestZiDebugFormat_Local )
-        REGISTER_TEST( D8049_ToolLongDebugRecord )
+        //REGISTER_TEST( TestForceInclude )
+        //REGISTER_TEST( TestZiDebugFormat )
+        //REGISTER_TEST( TestZiDebugFormat_Local )
+        //REGISTER_TEST( D8049_ToolLongDebugRecord )
     #endif
 REGISTER_TESTS_END
 
@@ -165,6 +167,18 @@ void TestDistributed::TestLocalRace()
     {
         const char * target( "badcode" );
         TestHelper( target, 1, true, true ); // compilation should fail, allow race
+    }
+}
+
+void TestDistributed::TestLocalRace_GAS()
+{
+    {
+        const char * target( "../tmp/Test/Distributed/dist_gas.lib" );
+        TestHelper( target, 1, false, true ); // allow race
+    }
+    {
+        const char * target( "../tmp/Test/Distributed/dist_gas.lib" );
+        TestHelper( target, 4, false, true ); // allow race
     }
 }
 
