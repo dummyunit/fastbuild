@@ -4,6 +4,7 @@
 // Includes
 //------------------------------------------------------------------------------
 #include "Tools/FBuild/FBuildCore/BFF/BFFParser.h"
+#include "Tools/FBuild/FBuildCore/BFF/Functions/Function.h"
 #include "Tools/FBuild/FBuildCore/FBuild.h"
 #include "Tools/FBuild/FBuildCore/Graph/NodeGraph.h"
 
@@ -54,8 +55,10 @@ extern "C" int LLVMFuzzerTestOneInput( const uint8_t * data, size_t size )
     str.Get()[ size ] = 0;
 
     NodeGraph ng;
+    Function::Create();
     BFFParser p( ng );
     p.ParseFromString( "fuzz.bff", str.Get() );
+    Function::Destroy();
 
     return 0;  // Non-zero return values are reserved for future use.
 }
