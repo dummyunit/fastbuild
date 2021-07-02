@@ -39,6 +39,12 @@ CopyDir( 'CopyDir' )
     #endif
 
     .SourcePaths                = '$Out$/Test/Copy/ObjectListChaining2/1/'
+#if __WINDOWS__
+    .SourcePathsPattern         = '*.obj'
+#endif
+#if __LINUX__ || __OSX__
+    .SourcePathsPattern         = '*.o'
+#endif
     .Dest                       = '$Out$/Test/Copy/ObjectListChaining2/2/'
 }
 
