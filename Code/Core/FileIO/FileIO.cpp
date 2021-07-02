@@ -39,6 +39,17 @@
     #include <sys/time.h>
 #endif
 
+#if !defined( __has_feature )
+    #define __has_feature( ... ) 0
+#endif
+
+#if __has_feature( memory_sanitizer )
+    extern "C" void __msan_unpoison( const volatile void * a, size_t size );
+    #define MSAN_UNPOISON( a, size ) __msan_unpoison( a, size )
+#else
+    #define MSAN_UNPOISON( a, size ) ( (void)0 )
+#endif
+
 // OSXHelper_utimensat
 //------------------------------------------------------------------------------
 #if defined( __APPLE__ )
@@ -90,6 +101,7 @@
     struct stat st;
     if ( lstat( fileName, &st ) == 0 )
     {
+        MSAN_UNPOISON( &st, sizeof( st ) );
         if ( ( st.st_mode & S_IFDIR ) != S_IFDIR )
         {
             return true; // exists and is NOT a folder
@@ -214,6 +226,7 @@
 
     struct stat stat_source;
     VERIFY( lstat( srcFileName, &stat_source ) == 0 );
+    MSAN_UNPOISON( &stat_source, sizeof( stat_source ) );
 
     // Special case symlinks.
     if ( S_ISLNK( stat_source.st_mode ) )
@@ -360,6 +373,7 @@
         struct stat s;
         if ( lstat( fileName.Get(), &s ) == 0 )
         {
+            MSAN_UNPOISON( &s, sizeof( s ) );
             info.m_Name = fileName;
             info.m_Attributes = s.st_mode;
             #if defined( __APPLE__ )
@@ -530,6 +544,7 @@
         struct stat st;
         if ( lstat( path.Get(), &st ) == 0 )
         {
+            MSAN_UNPOISON( &st, sizeof( st ) );
             if ( ( st.st_mode & S_IFDIR ) != 0 )
             {
                 return true; // exists and is folder
@@ -620,6 +635,7 @@
         {
             return false; // Can't stat the path  (probably doesn't exist)
         }
+        MSAN_UNPOISON( &pathStat, sizeof( pathStat ) );
 
         // Is it a dir?
         if ( ( pathStat.st_mode & S_IFDIR ) == 0 )
@@ -635,6 +651,7 @@
         {
             return false; // Can't stat parent dir, then something is wrong
         }
+        MSAN_UNPOISON( &parentStat, sizeof( parentStat ) );
 
         // Compare device ids
         if ( pathStat.st_dev != parentStat.st_dev )
@@ -669,12 +686,14 @@
         struct stat st;
         if ( lstat( fileName.Get(), &st ) == 0 )
         {
+            MSAN_UNPOISON( &st, sizeof( st ) );
             return ( ( (uint64_t)st.st_mtimespec.tv_sec * 1000000000ULL ) + (uint64_t)st.st_mtimespec.tv_nsec );
         }
     #elif defined( __LINUX__ )
         struct stat st;
         if ( lstat( fileName.Get(), &st ) == 0 )
         {
+            MSAN_UNPOISON( &st, sizeof( st ) );
             return ( ( (uint64_t)st.st_mtim.tv_sec * 1000000000ULL ) + (uint64_t)st.st_mtim.tv_nsec );
         }
     #else
@@ -801,6 +820,7 @@
         {
             return true; // can't even get the attributes, treat as not read only
         }
+        MSAN_UNPOISON( &s, sizeof( s ) );
         const bool currentlyReadOnly = !( ( s.st_mode & S_IWUSR ) == S_IWUSR ); // TODO:LINUX Is this the correct behaviour?
         if ( readOnly == currentlyReadOnly )
         {
@@ -850,6 +870,7 @@
         {
             return false; // can't even get the attributes, treat as not read only
         }
+        MSAN_UNPOISON( &s, sizeof( s ) );
         return ( ( s.st_mode & S_IWUSR ) == 0 );// TODO:LINUX Is this the correct behaviour?
     #else
         #error Unknown platform
@@ -948,6 +969,7 @@
         {
             return;
         }
+        MSAN_UNPOISON( &stat_source, sizeof( stat_source ) );
         if ( S_ISLNK( stat_source.st_mode ) )
         {
             return;
@@ -977,6 +999,7 @@
 
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 isDir = S_ISDIR( info.st_mode );
             }
 
@@ -1060,6 +1083,7 @@
         {
             return;
         }
+        MSAN_UNPOISON( &stat_source, sizeof( stat_source ) );
         if ( S_ISLNK( stat_source.st_mode ) )
         {
             return;
@@ -1089,6 +1113,7 @@
 
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 isDir = S_ISDIR( info.st_mode );
             }
 
@@ -1179,6 +1204,7 @@
         {
             return;
         }
+        MSAN_UNPOISON( &stat_source, sizeof( stat_source ) );
         if ( S_ISLNK( stat_source.st_mode ) )
         {
             return;
@@ -1208,6 +1234,7 @@
 
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 isDir = S_ISDIR( info.st_mode );
             }
 
@@ -1249,6 +1276,7 @@
                 // get additional info
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 newInfo.m_Attributes = info.st_mode;
                 #if defined( __APPLE__ )
                     newInfo.m_LastWriteTime = ( ( (uint64_t)info.st_mtimespec.tv_sec * 1000000000ULL ) + (uint64_t)info.st_mtimespec.tv_nsec );
@@ -1319,6 +1347,7 @@
         {
             return;
         }
+        MSAN_UNPOISON( &stat_source, sizeof( stat_source ) );
         if ( S_ISLNK( stat_source.st_mode ) )
         {
             return;
@@ -1348,6 +1377,7 @@
 
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 isDir = S_ISDIR( info.st_mode );
             }
 
@@ -1375,6 +1405,7 @@
                 // get additional info
                 struct stat info;
                 VERIFY( lstat( pathCopy.Get(), &info ) == 0 );
+                MSAN_UNPOISON( &info, sizeof( info ) );
                 newInfo.m_Attributes = info.st_mode;
                 #if defined( __APPLE__ )
                     newInfo.m_LastWriteTime = ( ( (uint64_t)info.st_mtimespec.tv_sec * 1000000000ULL ) + (uint64_t)info.st_mtimespec.tv_nsec );
@@ -1518,3 +1549,5 @@ bool FileIO::FileInfo::IsReadOnly() const
 }
 
 //------------------------------------------------------------------------------
+
+#undef MSAN_UNPOISON

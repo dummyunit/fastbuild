@@ -20,6 +20,17 @@
     #include <unistd.h>
 #endif
 
+#if !defined( __has_feature )
+    #define __has_feature( ... ) 0
+#endif
+
+#if __has_feature( memory_sanitizer )
+    extern "C" void __msan_unpoison( const volatile void * a, size_t size );
+    #define MSAN_UNPOISON( a, size ) __msan_unpoison( a, size )
+#else
+    #define MSAN_UNPOISON( a, size ) ( (void)0 )
+#endif
+
 // Defines
 //------------------------------------------------------------------------------
 #if defined( __APPLE__ ) || defined( __LINUX__ )
@@ -150,7 +161,7 @@ bool FileStream::Open( const char * fileName, uint32_t fileMode )
         {
             // Ensure this is not a directory
             struct stat s;
-            if ( ( fstat( m_Handle, &s ) != 0 ) || S_ISDIR( s.st_mode ) )
+            if ( ( fstat( m_Handle, &s ) != 0 ) || ( MSAN_UNPOISON( &s, sizeof( s ) ), S_ISDIR( s.st_mode ) ) )
             {
                 // not a file (e.g. a directory)
                 close( m_Handle );
@@ -361,3 +372,5 @@ bool FileStream::IsOpen() const
 #endif
 
 //------------------------------------------------------------------------------
+
+#undef MSAN_UNPOISON
