@@ -8,8 +8,9 @@
 //------------------------------------------------------------------------------
 #undef _FORTIFY_SOURCE
 
-// Use older memcpy
+// Use older implementations of glibc functions
 //------------------------------------------------------------------------------
+__asm__( ".symver clock_gettime,clock_gettime@GLIBC_2.2.5" );
 __asm__( ".symver memcpy,memcpy@GLIBC_2.2.5" );
 
 //------------------------------------------------------------------------------

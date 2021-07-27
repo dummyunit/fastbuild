@@ -15,8 +15,8 @@
 #if defined( __WINDOWS__ )
     #include "Core/Env/WindowsHeader.h"
 #else
+    #include "Core/Env/glibc_compat_stat.h"
     #include <fcntl.h>
-    #include <sys/stat.h>
     #include <unistd.h>
 #endif
 

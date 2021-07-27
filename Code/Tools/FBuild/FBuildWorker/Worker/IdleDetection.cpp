@@ -18,9 +18,9 @@
     #include <TlHelp32.h>
 #endif
 #if defined( __LINUX__ )
+    #include "Core/Env/glibc_compat_stat.h"
     #include <dirent.h>
     #include <stdlib.h>
-    #include <sys/stat.h>
 #endif
 #if defined( __OSX__ )
     #include <mach/mach_host.h>

@@ -20,12 +20,12 @@
     #include "Core/Time/Time.h"
 #endif
 #if defined( __LINUX__ ) || defined( __APPLE__ )
+    #include "Core/Env/glibc_compat_stat.h"
     #include <dirent.h>
     #include <errno.h>
     #include <libgen.h>
     #include <limits.h>
     #include <stdio.h>
-    #include <sys/stat.h>
     #include <unistd.h>
 #endif
 #if defined( __LINUX__ )
